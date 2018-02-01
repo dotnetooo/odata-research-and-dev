@@ -20,7 +20,8 @@ namespace odata_research.Controllers
         [EnableQuery]
         public IEnumerable<string> Get()
         {
-            Uri relativeUri = new Uri("Address?select=Street",UriKind.Relative);
+            ///https://blogs.msdn.microsoft.com/alexj/2012/12/06/parsing-filter-and-orderby-using-the-odatauriparser/
+            Uri relativeUri = new Uri("Customers?$filter=Name eq ‘ACME’", UriKind.Relative);
             metadata.MetadataBuilder m = new MetadataBuilder();
             var model= m.BuildAddress().GetModel();
             ODataUriParser parser = new ODataUriParser(model,relativeUri);

@@ -20,6 +20,9 @@ namespace metadata
             var idProperty = customer.AddStructuralProperty("Id", EdmCoreModel.Instance.GetInt32(isNullable));
             customer.AddKeys(idProperty);
             customer.AddStructuralProperty("Name", EdmCoreModel.Instance.GetString(isNullable));
+            
+
+            customer.AddStructuralProperty("City", EdmCoreModel.Instance.GetString(isNullable));
             model.AddElement(customer);
 
             var container = new EdmEntityContainer("metadata", "DefaultContainer");
@@ -40,6 +43,11 @@ namespace metadata
             set;
         }
         public int Id
+        {
+            get;
+            set;
+        }
+        public string City
         {
             get;
             set;

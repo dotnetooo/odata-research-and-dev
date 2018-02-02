@@ -7,38 +7,48 @@ namespace metadata
 {
     public class MetadataBuilder
     {
-        private readonly EdmModel _model = new EdmModel();
+        private readonly EdmModel model = new EdmModel();
         public MetadataBuilder()
         {
 
         }
         public  MetadataBuilder   BuildAddress()
+
         {
-            var _addressType = new EdmEntityType("metadata", "Address");
-            _addressType.AddStructuralProperty("Street", EdmPrimitiveTypeKind.String);
-            _addressType.AddStructuralProperty("City", EdmPrimitiveTypeKind.String);
-            _addressType.AddStructuralProperty("PostalCode", EdmPrimitiveTypeKind.Int32);
-            _model.AddElement(_addressType);
+            
+            var customer = new EdmEntityType("metadata", "Customer");
+            bool isNullable = false;
+            var idProperty = customer.AddStructuralProperty("Id", EdmCoreModel.Instance.GetInt32(isNullable));
+            customer.AddKeys(idProperty);
+            customer.AddStructuralProperty("Name", EdmCoreModel.Instance.GetString(isNullable));
+            
+
+            customer.AddStructuralProperty("City", EdmCoreModel.Instance.GetString(isNullable));
+            model.AddElement(customer);
+
+            var container = new EdmEntityContainer("metadata", "DefaultContainer");
+            container.AddEntitySet("Customers", customer);
+            model.AddElement(container);
             return this;
         }
         public IEdmModel GetModel()
         {
-            return _model;
+            return model;
         }
     }
-    public class Address
+    public class Customer
     {
-        public string PostalCode
+        public string Name
+        {
+            get;
+            set;
+        }
+        public int Id
         {
             get;
             set;
         }
         public string City
-        {
-            get;
-            set;
-        }
-        public string Street
         {
             get;
             set;

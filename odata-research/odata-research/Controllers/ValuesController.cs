@@ -5,7 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData;
 using Microsoft.OData.UriParser;
+using Microsoft.AspNetCore.OData.Query;
 using metadata;
+using System.Web.OData.NHibernate;
+
 namespace odata_research.Controllers
 {
     [Route("api/[controller]")]
@@ -18,14 +21,24 @@ namespace odata_research.Controllers
         // GET api/values
         [HttpGet]
         [EnableQuery]
-        public IEnumerable<string> Get()
+        public string Get()
         {
-            Uri relativeUri = new Uri("Address?select=Street",UriKind.Relative);
+            ///
+            ///https://github.com/OData/WebApi/issues/33
+            ///https://blogs.msdn.microsoft.com/alexj/2012/12/06/parsing-filter-and-orderby-using-the-odatauriparser/
+            ///https://archive.codeplex.com/?p=aspnetwebstack#src%2fSystem.Web.Http.OData%2fOData%2fBuilder%2fODataConventionModelBuilder.cs
+            Uri relativeUri = new Uri("Customers?$top = 2 &$skip = 0 &$orderby = Name desc, City asc &$filter = City eq 'Redmond'", UriKind.Relative);
             metadata.MetadataBuilder m = new MetadataBuilder();
             var model= m.BuildAddress().GetModel();
             ODataUriParser parser = new ODataUriParser(model,relativeUri);
             ODataPath path = parser.ParsePath();
-            return new string[] { "value1", "value2" };
+            FilterClause filter = parser.ParseFilter();
+            NHibernateFilterBinder binder = new NHibernateFilterBinder(model);
+            WhereClause where = NHibernateFilterBinder.GetWhere(filter, model);
+            string arguments = string.Join(":", where.PositionalParameters);
+            string clause = where.Clause;
+            return clause.Replace("?", arguments);
+
         }
 
         // GET api/values/5

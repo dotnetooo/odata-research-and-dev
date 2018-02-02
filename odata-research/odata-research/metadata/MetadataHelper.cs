@@ -14,7 +14,7 @@ namespace metadata
         }
         public  MetadataBuilder   BuildAddress()
         {
-            var _addressType = new EdmComplexType("metadata", "Address");
+            var _addressType = new EdmEntityType("metadata", "Address");
             _addressType.AddStructuralProperty("Street", EdmPrimitiveTypeKind.String);
             _addressType.AddStructuralProperty("City", EdmPrimitiveTypeKind.String);
             _addressType.AddStructuralProperty("PostalCode", EdmPrimitiveTypeKind.Int32);

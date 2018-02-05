@@ -33,6 +33,7 @@ namespace odata_research.Controllers
             ODataUriParser parser = new ODataUriParser(model,relativeUri);
             ODataPath path = parser.ParsePath();
             FilterClause filter = parser.ParseFilter();
+            var odaUri = parser.ParseUri();
             NHibernateFilterBinder binder = new NHibernateFilterBinder(model);
             WhereClause where = NHibernateFilterBinder.GetWhere(filter, model);
             string arguments = string.Join(":", where.PositionalParameters);

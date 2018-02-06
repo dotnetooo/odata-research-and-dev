@@ -18,7 +18,14 @@ namespace OdataTests
             QueryVisitor visitor = new QueryVisitor();
             string data= oDataUri.Filter.Expression.Accept<string>(visitor);
         }
-
+        [TestMethod]
+        public void parseOrderBy_query()
+        {
+            ODataUriParser parser = new ODataUriParser(getModel(), relativeUri);
+            ODataUri oDataUri = parser.ParseUri();
+            QueryVisitor visitor = new QueryVisitor();
+            string orderBy = oDataUri.OrderBy.ToSqlOrderBy();
+        }
         private static IEdmModel getModel()
         {
             return new MetadataBuilder()

@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Metadata\Metadata.csproj" />
+    <ProjectReference Include="..\OdataTests\OdataTests.csproj" />
   </ItemGroup>
 
 </Project>

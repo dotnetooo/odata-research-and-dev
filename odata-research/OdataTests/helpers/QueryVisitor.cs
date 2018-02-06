@@ -30,7 +30,7 @@ using Microsoft.OData;
         }
         public override string Visit(SingleValuePropertyAccessNode nodeIn)
         {
-        return nodeIn.Property.Name;
+            return base.Visit(nodeIn);
         }
         public override string Visit(SingleValueOpenPropertyAccessNode nodeIn)
         {

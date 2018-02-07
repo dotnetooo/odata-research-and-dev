@@ -9,11 +9,13 @@ using Microsoft.AspNetCore.OData.Query;
 using metadata;
 using System.Web.OData.NHibernate;
 using Microsoft.OData;
+using System.IO;
+using Microsoft.OData.Edm;
+using System.Text;
 
 namespace odata_research.Controllers
 {
-    [Route("api/[controller]")]
-   {
+   
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
@@ -39,21 +41,6 @@ namespace odata_research.Controllers
 
         }
 
-        // GET api/values/5
-        [HttpGet]
-        [Route("$metadata")]
-        public string GetMetadata()
-        {
-            IEdmModel model = new MetadataBuilder().BuildCustomer().GetModel();
-            MemoryStream stream = new MemoryStream();
-            OdataMessage message = new OdataMessage(stream);
-            ODataMessageWriterSettings settings = new ODataMessageWriterSettings();
-            ODataMessageWriter writer = new ODataMessageWriter((IODataResponseMessage)message, settings, model);
-            writer.WriteMetadataDocument();
-            return Encoding.UTF8.GetString(stream.ToArray());
-
-        }
-
         // POST api/values
         [HttpPost]
         public void Post([FromBody]string value)
@@ -72,5 +59,4 @@ namespace odata_research.Controllers
         {
         }
     }
-}
 }

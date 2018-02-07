@@ -5,11 +5,11 @@ VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "odata-research", "odata-research\odata-research.csproj", "{6B513FCB-7917-4996-9DC2-0AE7D55D45A0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Metadata", "Metadata\Metadata.csproj", "{939ED8CC-B014-4BB2-9F50-02AC17A794A9}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{466ED416-12F7-4630-BFAB-33D96A2619B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdataTests", "OdataTests\OdataTests.csproj", "{5C7BE433-E067-4DBD-996E-A1B3DD75E522}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OdataTests", "OdataTests\OdataTests.csproj", "{5C7BE433-E067-4DBD-996E-A1B3DD75E522}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OdataSqlExtension", "OdataSqlExtension\OdataSqlExtension.csproj", "{B99C8E94-1938-4081-8304-A39C0719623B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,14 +21,14 @@ Global
 		{6B513FCB-7917-4996-9DC2-0AE7D55D45A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B513FCB-7917-4996-9DC2-0AE7D55D45A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6B513FCB-7917-4996-9DC2-0AE7D55D45A0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{939ED8CC-B014-4BB2-9F50-02AC17A794A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{939ED8CC-B014-4BB2-9F50-02AC17A794A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{939ED8CC-B014-4BB2-9F50-02AC17A794A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{939ED8CC-B014-4BB2-9F50-02AC17A794A9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5C7BE433-E067-4DBD-996E-A1B3DD75E522}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5C7BE433-E067-4DBD-996E-A1B3DD75E522}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C7BE433-E067-4DBD-996E-A1B3DD75E522}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C7BE433-E067-4DBD-996E-A1B3DD75E522}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B99C8E94-1938-4081-8304-A39C0719623B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B99C8E94-1938-4081-8304-A39C0719623B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B99C8E94-1938-4081-8304-A39C0719623B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B99C8E94-1938-4081-8304-A39C0719623B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

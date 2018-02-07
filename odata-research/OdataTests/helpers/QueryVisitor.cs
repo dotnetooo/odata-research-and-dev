@@ -5,7 +5,7 @@ using Microsoft.OData.UriParser;
 using Microsoft.OData.Edm;
 using Microsoft.OData;
 
-   public sealed  class QueryVisitor:QueryNodeVisitor<string>
+   public  class QueryVisitor:QueryNodeVisitor<string>
     {
         public override string Visit(AllNode nodeIn)
         {

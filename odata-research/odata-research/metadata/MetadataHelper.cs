@@ -12,7 +12,7 @@ namespace metadata
         {
 
         }
-        public  MetadataBuilder   BuildAddress()
+        public  MetadataBuilder   BuildCustomer()
 
         {
             

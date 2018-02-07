@@ -10,6 +10,8 @@ namespace OdataTests
     public class UriParserTests
     {
         Uri relativeUri = new Uri("Customers?$top = 2 &$skip = 0 &$orderby = Name desc, City asc &$filter = City eq 'Redmond' and Name eq 'customerName' or State eq 'ut'", UriKind.Relative);
+        Uri relativeUriIn = new Uri("Customers?$filter = City eq 'ny ; salt lake city'", UriKind.Relative);
+
         [TestMethod]
         public void parseFilter_query_optionsOnly()
         {
@@ -18,7 +20,14 @@ namespace OdataTests
             QueryVisitor visitor = new QueryVisitor();
             string data= oDataUri.Filter.Expression.Accept<string>(visitor);
         }
-
+        [TestMethod]
+        public void parseFilter_query_inOperator()
+        {
+            ODataUriParser parser = new ODataUriParser(getModel(), relativeUriIn);
+            ODataUri oDataUri = parser.ParseUri();
+            QueryVisitor visitor = new QueryVisitor();
+            string data = oDataUri.Filter.Expression.Accept<string>(visitor);
+        }
         private static IEdmModel getModel()
         {
             return new MetadataBuilder()

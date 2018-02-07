@@ -19,10 +19,30 @@ using Microsoft.OData;
         {
             return base.Visit(nodeIn);
         }
-        public override string Visit(BinaryOperatorNode nodeIn)
+    public override string Visit(BinaryOperatorNode nodeIn)
+    {
+        string result = string.Empty;
+        if (nodeIn.OperatorKind != BinaryOperatorKind.Equal)
         {
-          return $"{nodeIn.Left.Accept<string>(this)} {nodeIn.OperatorKind.ToSqlOperator()} { nodeIn.Right.Accept<string>(this)}";
-
+            result= $"{nodeIn.Left.Accept<string>(this)} {nodeIn.OperatorKind.ToSqlOperator()} { nodeIn.Right.Accept<string>(this)}";
+        }
+        else
+        {
+            if(nodeIn.Right.Kind==QueryNodeKind.Constant)
+            {
+                string condition = nodeIn.Right.Accept<string>(this);
+                if(condition.Contains(";"))
+                {
+                    var values = condition.Split(new char[] { ';' });
+                    result= $"{nodeIn.Left.Accept<string>(this)} IN ( {string.Join(",",values)} )";
+                }
+                else
+                {
+                    result = $"{nodeIn.Left.Accept<string>(this)} {nodeIn.OperatorKind.ToSqlOperator()} { nodeIn.Right.Accept<string>(this)}";
+                }
+            }
+        }
+        return result;
         }
         public override string Visit(UnaryOperatorNode nodeIn)
         {

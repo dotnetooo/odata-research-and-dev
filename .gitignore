@@ -162,3 +162,5 @@ $RECYCLE.BIN/
 Source/ContractWizard/config.json
 odata-research/.vs/odata-research/v15/Server/sqlite3/storage.ide-shm
 odata-research/.vs/odata-research/v15/Server/sqlite3/storage.ide-wal
+*.lock
+*.ide

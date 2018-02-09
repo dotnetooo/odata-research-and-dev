@@ -55,12 +55,26 @@ namespace OdataTests
         [TestMethod]
         public void createMethodCallExpression()
         {
-            IQueryable data = new[] { "salt lake city", "new your" }
-                            .AsQueryable();
+            IQueryable<string> data = new[] { "salt lake city", "new your" }
+                            .AsQueryable<string>();
+            ParameterExpression pe = Expression.Parameter(typeof(string), "company");
+            Expression left = Expression.Call(pe, typeof(string).GetMethod("ToLower", System.Type.EmptyTypes));
+            Expression right = Expression.Constant("coho winery");
+            Expression e1 = Expression.Equal(left, right);
+
+            // Create an expression tree that represents the expression 'company.Length > 16'.  
+            left = Expression.Property(pe, typeof(string).GetProperty("Length"));
+            right = Expression.Constant(16, typeof(int));
+            Expression e2 = Expression.GreaterThan(left, right);
+
+            Expression predicateBody = Expression.OrElse(e1, e2);
             MethodCallExpression whereCallExpression = Expression.Call(
                 typeof(Queryable),
                 "Where",
-                new Type[] { typeof(string) });
+                new Type[] { data.ElementType },
+                data.Expression,
+                Expression.Lambda<Func<string, bool>>(predicateBody, new ParameterExpression[] { pe }));
+
             IQueryable<string> results = data.Provider.CreateQuery<string>(whereCallExpression);
             foreach(string s in results)
             {

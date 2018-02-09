@@ -14,19 +14,16 @@ namespace OdataTests.helpers
                , nodeIn.Right.Accept<Expression>(this));
             return binaryExpression;
         }
-        public override Expression Visit(SingleValuePropertyAccessNode nodeIn)
-        {
-            return null;
-        }
+        
         public override Expression Visit(ConvertNode nodeIn)
         {
           var value= (nodeIn.Source as SingleValuePropertyAccessNode)?.Property?.Name;
-            UnaryExpression typeAsExpression = Expression.TypeAs(Expression.Constant(value, typeof(string)), typeof(string));
-            return typeAsExpression;
+          return Expression.Constant(value, typeof(string));
+          
         }
         public override Expression Visit(ConstantNode nodeIn)
         {
-            return Expression.Constant(nodeIn.LiteralText, typeof(string));
+            return Expression.Constant(nodeIn.LiteralText,typeof(string));
         }
     }
 }

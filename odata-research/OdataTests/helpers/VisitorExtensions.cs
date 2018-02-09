@@ -124,7 +124,19 @@ public static class VisitorExtensions
         }
         return builder.ToString();
     }
-     public static string ToSqlWhereClause(this FilterClause filterClause)
+    public static Expression ToExpression(this OrderByClause orderClause)
+    {
+        StringBuilder builder = new StringBuilder("Order By ");
+        while (orderClause != null)
+        {
+            builder.AppendFormat("{0} {1}", (orderClause.Expression as SingleValuePropertyAccessNode)?.Property.Name,
+                                          orderClause.Direction == OrderByDirection.Ascending ? "ASC" : "DESC");
+            orderClause = orderClause.ThenBy;
+            if (null != orderClause) { builder.Append(","); }
+        }
+        return Expression.Constant(builder.ToString(), typeof(string));
+    }
+    public static string ToSqlWhereClause(this FilterClause filterClause)
     {
         QueryVisitor visitor = new QueryVisitor();
         return filterClause.Expression.Accept<string>(visitor);

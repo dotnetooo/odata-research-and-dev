@@ -3,6 +3,8 @@ using Microsoft.OData.UriParser;
 using Microsoft.OData.Edm;
 using Microsoft.OData;
 using System;
+using OdataTests.helpers;
+using System.Linq.Expressions;
 
 namespace OdataTests
 {
@@ -25,6 +27,16 @@ namespace OdataTests
             ODataUri oDataUri = parser.ParseUri();
             QueryVisitor visitor = new QueryVisitor();
             string orderBy = oDataUri.OrderBy.ToSqlOrderBy();
+        }
+        [TestMethod]
+        public void parserFilter_expression()
+        {
+            ODataUriParser parser = new ODataUriParser(getModel(), relativeUri);
+            ODataUri oDataUri = parser.ParseUri();
+            QueryVistorExpression visitor = new QueryVistorExpression();
+            var expression= oDataUri.Filter.Expression.Accept<Expression>(visitor);
+            string value = expression.ToString();
+           
         }
         private static IEdmModel getModel()
         {

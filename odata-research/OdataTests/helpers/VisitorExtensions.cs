@@ -1,25 +1,19 @@
 ﻿using Microsoft.OData.UriParser;
+using OdataTests;
+using OdataTests.helpers;
 using System.Linq.Expressions;
 using System.Text;
 
 public static class VisitorExtensions
     {
     
-    //public Expression ToExpression(this QueryNode query)
-    //{
-    //    switch(query)
-    //    {
-    //        case SingleValueNode singleValueNode:
-    //            break;
-    //        case NamedFunctionParameterNode functionParamNode:
-    //            break;
-    //        case CollectionNode collectionNode:
-    //            break;
-    //        case QueryNode queryNode:
-    //            break;
-           
-    //    }
-    //}
+    public static LambdaExpression ToLambda<TModel>(this FilterClause filter) where TModel:class
+    {
+        QueryLambdaExpression<TModel> visitor = new QueryLambdaExpression<TModel>();
+        var expbody = filter.Expression.Accept<Expression>(visitor);
+        LambdaExpression lambda = Expression.Lambda(expbody, visitor.LambdaParam);
+        return lambda;
+    }
     public static ExpressionType ToExpressionKind(this BinaryOperatorKind binaryOperator)
     {
         switch (binaryOperator)

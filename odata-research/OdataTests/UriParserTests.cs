@@ -114,7 +114,9 @@ namespace OdataTests
                 var ok = filter.Compile().DynamicInvoke(U) as bool?;
                 return ok.Value;
             }).ToList();
-           
+            // or
+            result = source.Where(u => (filter.Compile().DynamicInvoke(u) as bool?).Value).ToList();
+
             Expression<Func<User, bool>> expression = user => user.Name == "UserName";
             result= source.Where(expression.Compile()).ToList();
             BinaryExpression expr = expression.Body as BinaryExpression;
@@ -124,18 +126,60 @@ namespace OdataTests
                 Expression value = expr.Right;
              
             }
+          
         }
-        public class User
+       
+        [TestMethod]
+        public void parseGenericExpression()
         {
-            public string ID
-            {
-                get;set;
-            }
-            public string Name
-            {
-                get;
-                set;
-            }
+            List<User> source = new List<User>();
+            source.Add(new User() { Name = "ruslan" });
+            source.Add(new User());
+            var filter = createGenericExpression<User>("ruslan", "Name");
+           var result = source.Where(u => (filter.Compile().DynamicInvoke(u) as bool?).Value).ToList();
+            Assert.IsTrue(1 == result.Count);
+        }
+
+        [TestMethod]
+        public void testExpressionVisitor()
+        {
+            //arrange
+            List<Customer> source = new List<Customer>();
+            source.Add(new Customer() { Name = "ruslan" });
+            source.Add(new Customer() { Name = "customerName", City="Redmond" });
+            ODataUriParser parser = new ODataUriParser(getModel(), relativeUri);
+            ODataUri oDataUri = parser.ParseUri();
+            var lambda = oDataUri.Filter.ToLambda<Customer>()?.Compile();
+            var result = source.Where(m => (lambda.DynamicInvoke(m) as bool?).Value);
+            Assert.IsTrue(1 == result.Count());
+            
+        }
+       private LambdaExpression createGenericExpression<TModel>(string propertyValue,string propertyName)
+        {
+            ParameterExpression userParam = Expression.Parameter(typeof(TModel), "Model");// lambda expression parameter
+
+            MemberExpression memberExpression = Expression.Property(userParam, propertyName);
+
+            ConstantExpression property = Expression.Constant(propertyValue);
+
+            BinaryExpression body = Expression.Equal(memberExpression, property);
+
+            LambdaExpression filter = Expression.Lambda(body, userParam);
+            return filter;
+        }
+    }
+
+
+    public class User
+    {
+        public string ID
+        {
+            get; set;
+        }
+        public string Name
+        {
+            get;
+            set;
         }
     }
 }

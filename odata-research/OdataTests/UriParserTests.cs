@@ -7,6 +7,7 @@ using OdataTests.helpers;
 using System.Linq.Expressions;
 using System.Linq;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace OdataTests
 {
@@ -88,6 +89,53 @@ namespace OdataTests
             return new MetadataBuilder()
                 .BuildCustomer()
                 .GetModel();
+        }
+        [TestMethod]
+        public  void parseExpression()
+        {
+            List<User> source = new List<User>();
+            source.Add(new User() { Name="ruslan"});
+            source.Add(new User());
+            User target = new User() { Name = "ruslan" };
+            ParameterExpression userParam = Expression.Parameter(typeof(User), "Username");// lambda expression parameter
+
+            MemberExpression memberExpression = Expression.Property(userParam, "Name");
+
+            ConstantExpression property = Expression.Constant("ruslan");
+
+            BinaryExpression body = Expression.Equal(memberExpression, property);
+
+            LambdaExpression filter = Expression.Lambda(body, userParam);
+
+            Expression<Func<User, bool>> expFilter = Expression.Lambda<Func<User, bool>>(body, userParam);
+
+            var result = source.Where((U) =>
+            {
+                var ok = filter.Compile().DynamicInvoke(U) as bool?;
+                return ok.Value;
+            }).ToList();
+           
+            Expression<Func<User, bool>> expression = user => user.Name == "UserName";
+            result= source.Where(expression.Compile()).ToList();
+            BinaryExpression expr = expression.Body as BinaryExpression;
+            if (expr.NodeType == ExpressionType.Equal)
+            {
+                Expression objecAccess = expr.Left;
+                Expression value = expr.Right;
+             
+            }
+        }
+        public class User
+        {
+            public string ID
+            {
+                get;set;
+            }
+            public string Name
+            {
+                get;
+                set;
+            }
         }
     }
 }

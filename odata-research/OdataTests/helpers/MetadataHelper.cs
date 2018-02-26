@@ -4,6 +4,24 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.OData.Edm;
 
+   public class Customer
+{
+    public string Name
+    {
+        get;
+        set;
+    }
+    public string City
+    {
+        get;
+        set;
+    }
+    public string State
+    {
+        get;
+        set;
+    }
+}
     public class MetadataBuilder
     {
         private readonly EdmModel model = new EdmModel();

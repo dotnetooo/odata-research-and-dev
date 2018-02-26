@@ -8,14 +8,39 @@ using System.Linq.Expressions;
 using System.Linq;
 using System.Diagnostics;
 using System.Collections.Generic;
+using Microsoft.OData.UriParser.Aggregation;
+using System.Reflection;
 
 namespace OdataTests
 {
     [TestClass]
     public class UriParserTests
     {
+
         Uri relativeUri = new Uri("Customers?$top = 2 &$skip = 0 &$orderby = Name desc, City asc &$filter = City eq 'Redmond' and Name eq 'customerName' or State eq 'ut' and State ne 'uta'", UriKind.Relative);
+
+
+        #region OdataQueryParser
         [TestMethod]
+        public void parseFilter()
+        {
+            string filterStr = "City eq 'Redmond' and Name eq 'customerName' or Id eq 9.80000360";
+            string orderBy = "Rating,Category/Name desc";
+            UriQueryExpressionParser parser = new UriQueryExpressionParser(50);
+            QueryToken token=  parser.ParseFilter(filterStr);
+            NodeVisitor visitor = new NodeVisitor();
+            string where= token.Accept<string>(visitor);
+            IEnumerable<OrderByToken> tokens = typeof(UriQueryExpressionParser)
+                                              .GetMethod("ParseOrderBy", BindingFlags.NonPublic | BindingFlags.Instance)
+                                              .Invoke(parser, new object[] { orderBy })
+                                               as IEnumerable<OrderByToken>;
+        }
+        #endregion
+
+
+
+        [TestMethod]
+
         public void parseFilter_query_optionsOnly()
         {
             ODataUriParser parser = new ODataUriParser(getModel(), relativeUri);
@@ -23,6 +48,7 @@ namespace OdataTests
             QueryVisitor visitor = new QueryVisitor();
             string data= oDataUri.Filter.Expression.Accept<string>(visitor);
         }
+        
         [TestMethod]
         public void parseOrderBy_query()
         {

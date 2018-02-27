@@ -24,7 +24,7 @@ namespace OdataTests
         [TestMethod]
         public void parseFilter()
         {
-            string filterStr = "City eq 'Redmond' and Name eq 'customerName' or Id eq 9.80000360";
+            string filterStr = "2 eq 1";
             string orderBy = "Rating,Category/Name desc";
             UriQueryExpressionParser parser = new UriQueryExpressionParser(50);
             QueryToken token=  parser.ParseFilter(filterStr);

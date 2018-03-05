@@ -14,14 +14,16 @@ namespace OdataTests.helpers
         char? Ch;
         Node currentNode;
         string NodeText;
-        const char QUERYOPTIONIDENTIFIER = '@';
+        const char QUERYOPTIONIDENTIFIER = '$';
         const char DELIMITER = '&';
         const char SEPARATOR = ',';
+        const char QUERYVALUEIDENTIFIER = '=';
+
         StringBuilder _tokenizedFilter = new StringBuilder();
-        TokenType SqlTokenType = TokenType.LEFTOPER;
         private static char[] Operators = new char[] { '=', '>', '<', '!' };// to be growing
         private static string[] ComparisonOperators = new string[] { "=", "!=", ">=", "<=", ">", "<" };
         private static string[] LogicalOperators = new string[] { "AND", "OR", "NOT" };//to be growing
+
         public SimpleLexer(string filter)
         {
             if (string.IsNullOrEmpty(filter))
@@ -42,30 +44,19 @@ namespace OdataTests.helpers
             if (this.TextLen == this.TextPos) return null;
             ParseWhiteSpace();
             int tokenPos = this.TextPos;
-            SqlTokenType = (SqlTokenType == TokenType.COMPARISON) ? TokenType.RIGHTOPER :
-                          TokenType.LEFTOPER;
             switch (this.Ch)
             {
-                case SEPARATOR:
-                    break;
+               
                 case QUERYOPTIONIDENTIFIER:
-                    //1. parserwhitespacee 2.read token; 
+                    ParseWhiteSpace();
+                    ReadQueryOption();
                     break;
-                case '=':
-                    SqlTokenType = TokenType.COMPARISON;
-                    ReadOperator();
+                case QUERYVALUEIDENTIFIER:
+                    ParseWhiteSpace();
+                    ReadToken();
                     break;
-                case '!':
-                    SqlTokenType = TokenType.COMPARISON;
-                    ReadOperator();
-                    break;
-                case '>':
-                    SqlTokenType = TokenType.COMPARISON;
-                    ReadOperator();
-                    break;
-                case '<':
-                    SqlTokenType = TokenType.COMPARISON;
-                    ReadOperator();
+                case DELIMITER:
+                    ParseWhiteSpace();
                     break;
                 default:
                     ParseWhiteSpace();
@@ -80,6 +71,22 @@ namespace OdataTests.helpers
             while (null != (this.currentNode = this.NextNode()))
             {
                yield  return this.currentNode;
+            }
+        }
+        private void ReadQueryOption()
+        {
+            if (!Ch.HasValue) NextChar();
+            while (this.Ch.HasValue && this.Ch!=QUERYVALUEIDENTIFIER)
+            {
+                NextChar();
+            }
+        }
+        private void ReadQueryOptionValue()
+        {
+            if (!Ch.HasValue) NextChar();
+            while (this.Ch.HasValue && this.Ch !=DELIMITER)
+            {
+                NextChar();
             }
         }
         private bool IsWhiteSpace
@@ -135,33 +142,11 @@ namespace OdataTests.helpers
         }
         internal enum TokenType
         {
-            UNDEFINED = 0,
-            COMPARISON = 1,
-            LOGICAL = 2,
-            LEFTOPER = 3,
-            RIGHTOPER = 4,
-            END = 5
+            OPTIONIDENTIFIER,
+            EQSIGN,
+            QUERYOPTIONNAME
         }
 
-        private void WriteToken(string token)
-        {
-            switch (this.SqlTokenType)
-            {
-                case TokenType.COMPARISON:
-                    _tokenizedFilter.AppendFormat("{0}", token);
-                    break;
-                case TokenType.LEFTOPER:
-                    _tokenizedFilter.AppendFormat(" @{0}", token);
-                    break;
-                case TokenType.LOGICAL:
-                    _tokenizedFilter.AppendFormat(" {0} ", token);
-                    break;
-                case TokenType.RIGHTOPER:
-                    _tokenizedFilter.AppendFormat("{0} ", token);
-                    break;
-
-            }
-        }
     }
 
 

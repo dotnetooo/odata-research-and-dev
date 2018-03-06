@@ -55,10 +55,11 @@ namespace OdataTests.helpers
 
 
         [DataTestMethod]
-        [DataRow("count(1,8), average(2)", DisplayName = "MetricWithSpace")]
+        [DataRow("count(1 8,3), average(2)", DisplayName = "MetricWithSpace")]
         [DataRow("count(1),average(2)", DisplayName = "MetricNoSpace")]
         [DataRow("count(1  ),average(2)", DisplayName = "MetricSpaceInFuction")]
         [DataRow("count(1  ) average(2)", DisplayName = "MetricNoDelimiter")]
+        [DataRow("count(),average()", DisplayName = "MetricNoDelimiter")]
         public void parseMetricSuccess(string metric)
         {
             RocketUriParser parser = new RocketUriParser();
@@ -89,6 +90,7 @@ namespace OdataTests.helpers
                 {
                     throw new Exception($"Can't process {metric} at position: {token.Position} token: {token.Text}");
                 }
+                // setting function name
                 FunctionToken metricToken = new FunctionToken();
                 metricToken.Text = token.Text;
                 metricToken.Function = token.Text;
@@ -97,21 +99,57 @@ namespace OdataTests.helpers
                 {
                     token = lexer.NextToken();
                 }
-                if (token.Kind == ExpressionTokenKind.Identifier)
-                {
-                    metricToken.Arguments.Add(token.Text);
-                    token = lexer.NextToken();
-                }
                 else
                 {
-                    throw new Exception($"Can't process {metric} at position: {token.Position} token: {token.Text}");
+                    throw new Exception($" OpenParen are not found. Can't process {metric} at position: {token.Position} token: {token.Text}");
                 }
+                // adding an argument if exist
+                if (token.Kind == ExpressionTokenKind.Identifier)
+                {
+                   if( int.TryParse(token.Text,out var myvalue))
+                    {
+                        metricToken.Arguments.Add(myvalue);
+                    }
+                   else
+                    {
+                        throw new Exception($"Invalid argument for {metricToken.Function}.Arg {myvalue}");
+                    }
+                    
+                    token = lexer.NextToken();
+                }
+                else if(token.Kind==ExpressionTokenKind.CloseParen)
+                {
+                    tokens.Add(metricToken);
+                    continue;
+                }
+                // going all possible arguments separated by space
+                while(token.Kind==ExpressionTokenKind.Identifier)
+                {
+                    if (int.TryParse(token.Text, out var myvalue))
+                    {
+                        metricToken.Arguments.Add(myvalue);
+                    }
+                    else
+                    {
+                        throw new Exception($"Invalid argument for {metricToken.Function}.Arg {myvalue}");
+                    }
+                    token = lexer.NextToken();
+                }
+                // in case arguments are separated by comma
                 while (token.Kind == ExpressionTokenKind.Comma)
                 {
                     token = lexer.NextToken();
                     if (token.Kind == ExpressionTokenKind.Identifier)
                     {
-                        metricToken.Arguments.Add(token.Text);
+                        if (int.TryParse(token.Text, out var myvalue))
+                        {
+                            metricToken.Arguments.Add(myvalue);
+                        }
+                        else
+                        {
+                            throw new Exception($"Invalid argument for {metricToken.Function}.Arg {myvalue}");
+                        }
+
                     }
                     else
                     {

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace OdataTests.helpers
 {
-    public sealed class SimpleLexer
+    public sealed class SimpleLexer 
     {
         string Text;
         int TextLen;

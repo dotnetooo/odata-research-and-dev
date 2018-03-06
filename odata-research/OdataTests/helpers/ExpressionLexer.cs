@@ -5,6 +5,8 @@ using System.Globalization;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using System.Collections.ObjectModel;
+
 namespace OdataTests.helpers
 {
     [TestClass]
@@ -22,7 +24,7 @@ namespace OdataTests.helpers
             {
                 tokens.Add(token.Text);
             }
-            Assert.IsTrue(tokens.Count == 8);
+            Assert.IsTrue(tokens.Count == 9);
         }
         [TestMethod]
         public void testFilter()
@@ -40,7 +42,7 @@ namespace OdataTests.helpers
         [TestMethod]
         public void testFilterProcced()
         {
-            string metric = "column1!=value1 AND column2=value2 or column3='ruslan'";
+            string metric = "column1!=value1 and column2=value2 or column3='ruslan'";
             ExpressionLexer lexer = new ExpressionLexer(metric);
             ExpressionToken token;
             List<ExpressionToken> tokens = new List<ExpressionToken>();
@@ -50,6 +52,8 @@ namespace OdataTests.helpers
             }
             Assert.IsTrue(tokens.Count == 13);
         }
+
+
         [DataTestMethod]
         [DataRow("count(1,8), average(2)", DisplayName = "MetricWithSpace")]
         [DataRow("count(1),average(2)", DisplayName = "MetricNoSpace")]
@@ -61,7 +65,9 @@ namespace OdataTests.helpers
             var result = parser.ParseMetric(metric).ToList();
             Assert.IsTrue(result.Count == 2);
             Assert.IsTrue(result[0].Function == "count");
+            Assert.IsTrue(result[0].GetTokenKind() == TokenKind.Function);
             Assert.IsTrue(result[1].Function == "average");
+            Assert.IsTrue(result[1].GetTokenKind() == TokenKind.Function);
         }
 
     }
@@ -72,7 +78,7 @@ namespace OdataTests.helpers
         {
             ExpressionLexer lexer = new ExpressionLexer(metric);
             List<FunctionToken> tokens = new List<FunctionToken>();
-            ExpressionToken token;
+            ExpressionToken token = default(ExpressionToken);
             while ((token = lexer.NextToken()).Kind != ExpressionTokenKind.End)
             {
                 if (token.Kind == ExpressionTokenKind.Comma)
@@ -233,7 +239,7 @@ namespace OdataTests.helpers
             Token.Position = tokenPos;
             return Token;
         }
-
+        
         public ExpressionToken TryPeekNext()
         {
             int savedPosition = this.TextPos;
@@ -310,6 +316,7 @@ namespace OdataTests.helpers
         /// <summary>Position of token.</summary>
         internal int Position;
 
+       
         /// <summary>Checks whether this token is a comparison operator.</summary>
         internal bool IsComparisonOperator
         {
@@ -574,19 +581,51 @@ namespace OdataTests.helpers
 
     public abstract class Token
     {
+      
         public string Text { get; set; }
-    }
-    public class FunctionToken : Token
-    {
-        public List<object> _functionArguments = new List<object>();
-        public FunctionToken()
+        public virtual TokenKind GetTokenKind()
         {
-
+            var tokenKind = TokenKind.Unknown;
+            switch (Text?.Trim()?.ToLower())
+            {
+                case ExpressionConstants.KeywordAnd:
+                    tokenKind = TokenKind.LogicalAnd;
+                    break;
+                case ExpressionConstants.KeywordOr:
+                    tokenKind = TokenKind.LogicalOr;
+                    break;
+                default:
+                    tokenKind = TokenKind.Identifier;
+                    break;
+            }
+            return tokenKind;
         }
+    }
+    public enum TokenKind
+        {
+            Unknown,
+            Identifier,
+            Function,
+            LogicalAnd,
+            LogicalOr
+        }
+    public sealed class FunctionToken : Token
+    {
+        private List<object> _functionArguments = new List<object>();
+        public FunctionToken() : base() { }
+  
         public string Function { get; set; }
-        public List<object> Arguments
+        internal List<object> Arguments
         {
             get { return _functionArguments; }
+        }
+        public ReadOnlyCollection<Object> GetArguments
+        {
+            get { return new ReadOnlyCollection<object>(_functionArguments); }
+        }
+        public override TokenKind GetTokenKind()
+        {
+            return TokenKind.Function;
         }
     }
 }

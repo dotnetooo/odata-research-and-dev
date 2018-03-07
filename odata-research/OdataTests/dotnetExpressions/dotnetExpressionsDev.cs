@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq.Expressions;
@@ -16,6 +17,29 @@ namespace OdataTests.dotnetExpressions
             var merged = ExpressionExtensions.AddNewExpression(exp, toadd);
             string result = merged.ToString();
 
+
+        }
+        [TestMethod]
+        public void CreateMuliptleBinaryExpressions()
+        {
+            ParameterExpression name = Expression.Parameter(typeof(string),"n");
+            var b1 = Expression.MakeBinary(ExpressionType.Equal,
+                Expression.Constant("value2"), name);
+            var b2 = Expression.MakeBinary(ExpressionType.Equal,
+               Expression.Constant("value2"), name);
+               
+
+            var joined = Expression.MakeBinary(ExpressionType.And,
+                b1,
+                b2
+                );
+            var l = Expression.Lambda<Func<string,bool>>(joined, name);
+                 
+
+            List<string> names = new List<string>();
+            names.Add("value2");
+            var resul = names.Where((n) => l.Compile().Invoke(n)).ToList();
+          
 
         }
         [TestMethod]

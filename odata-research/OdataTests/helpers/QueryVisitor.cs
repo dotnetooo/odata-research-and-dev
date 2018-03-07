@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.OData.UriParser;
-using Microsoft.OData.Edm;
-using Microsoft.OData;
-
-   public sealed  class QueryVisitor:QueryNodeVisitor<string>
+﻿using Microsoft.OData.UriParser;
+using System.Linq;
+public sealed  class QueryVisitor:QueryNodeVisitor<string>
     {
+    private readonly ParamCollection Parameters = new ParamCollection();
         public override string Visit(AllNode nodeIn)
         {
             return base.Visit(nodeIn);
@@ -106,11 +102,15 @@ using Microsoft.OData;
         }
         public override string Visit(ConvertNode nodeIn)
         {
-          return (nodeIn.Source as Microsoft.OData.UriParser.SingleValuePropertyAccessNode)?.Property?.Name;
+          var property=(nodeIn.Source as SingleValuePropertyAccessNode)?.Property?.Name;
+         Parameters.Add(new SqlParam() { Name = $"@{property}" });
+         return property;
         }
         public override string Visit(ConstantNode nodeIn)
         {
-           return nodeIn.LiteralText;
+          var param= Parameters.Last();
+          param.Value = nodeIn.Value;
+          return param.Name;
         }
         public override string Visit(CollectionResourceFunctionCallNode nodeIn)
         {
@@ -136,5 +136,9 @@ using Microsoft.OData;
         {
             return base.Visit(nodeIn);
         }
+       public string[] ParametersKeys => Parameters.ParameterKeys;
+      public object[] ParameterValues => Parameters.ParameterValues;
+   
+
     }
 

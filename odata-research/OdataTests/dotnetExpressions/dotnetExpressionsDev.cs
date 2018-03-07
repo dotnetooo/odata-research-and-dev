@@ -12,7 +12,11 @@ namespace OdataTests.dotnetExpressions
         public void CheckBinaryExpression()
         {
             var exp = ExpressionExtensions.GetExpression<int>(5, 10);
-            var value = exp.ToString();
+            var toadd = ExpressionExtensions.GetExpression<int>(7, 15);
+            var merged = ExpressionExtensions.AddNewExpression(exp, toadd);
+            string result = merged.ToString();
+
+
         }
         [TestMethod]
         public void GetLambdaExpression()
@@ -33,6 +37,15 @@ namespace OdataTests.dotnetExpressions
                 Expression.Constant(operLeft),
                 Expression.Constant(operRight)
                 );
+        }
+        public static BinaryExpression AddNewExpression(BinaryExpression exptoAdd,BinaryExpression existing)
+        {
+           
+                return Expression.MakeBinary(ExpressionType.And,
+                    existing,
+                    exptoAdd
+                    );
+            
         }
         public static LambdaExpression GetLambdaExp(string left, string right)
         {

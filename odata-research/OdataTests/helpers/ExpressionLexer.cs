@@ -371,11 +371,8 @@ namespace OdataTests.helpers
                     this.Text == ExpressionConstants.KeywordLessThan ||
                     this.Text == ExpressionConstants.KeywordGreaterThan ||
                     this.Text == ExpressionConstants.KeywordLessThanOrEqual ||
-                    this.Text == ExpressionConstants.KeywordGreaterThanOrEqual ||
-                    this.Kind == ExpressionTokenKind.EqualSign ||
-                    this.Kind == ExpressionTokenKind.GreaterSign ||
-                    this.Kind == ExpressionTokenKind.LessOrEqualSign ||
-                    this.Kind == ExpressionTokenKind.GreaterOrEqualSign;
+                    this.Text == ExpressionConstants.KeywordGreaterThanOrEqual ;
+                    
             }
         }
 

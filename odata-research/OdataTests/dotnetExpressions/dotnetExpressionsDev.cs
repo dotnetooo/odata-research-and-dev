@@ -9,6 +9,43 @@ namespace OdataTests.dotnetExpressions
     [TestClass]
    public  class dotnetExpressionsDev
     {
+        [TestMethod]
+        public void ExpConstants()
+        {
+            
+        }
+        [TestMethod]
+        public void makeOneSqlExpression()
+        {
+
+            string whereClause = "colum1=value1 and column2=value3 or column3!=value3";
+            // start from right
+            var bexp = Expression.MakeBinary(
+                ExpressionType.Or,
+                Expression.MakeBinary(ExpressionType.And,
+                Expression.MakeBinary(ExpressionType.Equal,
+                Expression.Constant("column1"), Expression.Constant("value1")),
+                Expression.MakeBinary(ExpressionType.Equal, Expression.Constant("column2"), Expression.Constant("value2")))
+               , Expression.MakeBinary(ExpressionType.NotEqual, Expression.Constant("column3"), Expression.Constant("value3")));
+
+            //now extending
+            var expExented = Expression.MakeBinary(ExpressionType.And,
+                bexp,
+                Expression.MakeBinary(ExpressionType.Equal,
+                Expression.Constant("column4"), Expression.Constant("value4")));
+
+            string result = bexp.ToString();
+            string extResult = expExented.ToString();
+            MyExpressionVisitor visitor = new MyExpressionVisitor();
+            SqlStatement sqlStatement = new SqlStatement(visitor);
+            // start building slq tree
+            var select= Expression.Constant("Select column1,column2,column4");
+            var addingFrom = Expression.Coalesce(select, Expression.Constant("From MyTable"));
+            // Expression.Coalesc does not accep constants of differen type;
+            string resultSql = visitor.Visit(expExented);
+
+
+        }
         #region Binding Examples
         [TestMethod]
         public void bindProperty()
@@ -238,6 +275,10 @@ namespace OdataTests.dotnetExpressions
             else if(expType==ExpressionType.Equal)
             {
                 return "=";
+            }
+            else if(expType==ExpressionType.Coalesce)
+            {
+                return " ";
             }
             else
             {

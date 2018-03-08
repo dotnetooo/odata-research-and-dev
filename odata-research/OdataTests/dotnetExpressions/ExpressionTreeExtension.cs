@@ -3,12 +3,30 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
-
+using System.Linq;
 namespace OdataTests.expressionTests
 {
     [TestClass]
    public class ExpressionTreeExtension
     {
+        [TestMethod]
+        public void executeAgainstIQuerable()
+        {
+            var names = new string[] { "ruslan", "tanya", "max", "denis" };
+            ParameterExpression pe = Expression.Parameter(typeof(string), "name");
+            IQueryable<string> source = names.AsQueryable<string>();
+            Expression e1 = Expression.Equal(Expression.Constant("ruslan"), pe);
+            MethodCallExpression whereCallExpression = Expression.Call(
+                typeof(Queryable),
+                "Where",
+                new Type[] { source.ElementType },
+                source.Expression,
+                Expression.Lambda<Func<string, bool>>(e1, new ParameterExpression[] { pe }));
+           var query=  source.Provider.CreateQuery<string>(whereCallExpression);
+            int count = query.Count();
+
+
+        }
         [TestMethod]
         public void walkingTreee()
         {

@@ -9,6 +9,23 @@ namespace OdataTests.dotnetExpressions
     [TestClass]
    public  class dotnetExpressionsDev
     {
+        #region Binding Examples
+        [TestMethod]
+        public void bindProperty()
+        {
+            var par = Expression.Parameter(typeof(string), "id");
+            var nObject = Expression.New(typeof(MyModel));
+            var bindingExp = new[]
+            {
+                Expression.Bind(typeof(MyModel).GetProperty("Id"),par)
+            };
+            var objecInt = Expression.MemberInit(nObject, bindingExp);
+            var lambda = Expression.Lambda<Func<string, MyModel>>(objecInt, par);
+            var mymodel= lambda.Compile().Invoke("123");
+            Assert.IsNotNull(mymodel);
+
+        }
+        #endregion
         [TestMethod]
         public void parseSql()
         {

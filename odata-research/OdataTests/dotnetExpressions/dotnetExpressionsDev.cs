@@ -33,8 +33,14 @@ namespace OdataTests.dotnetExpressions
                 b1,
                 b2
                 );
-            var l = Expression.Lambda<Func<string,bool>>(joined, name);
-                 
+            var secjoined = Expression.MakeBinary(ExpressionType.Or,
+                joined,
+                Expression.MakeBinary(ExpressionType.Equal,
+               Expression.Constant("value2"), name));
+
+            var l = Expression.Lambda<Func<string,bool>>(secjoined, name);
+
+             
 
             List<string> names = new List<string>();
             names.Add("value2");
@@ -42,6 +48,22 @@ namespace OdataTests.dotnetExpressions
           
 
         }
+        [TestMethod]
+        public void MakeLambda()
+        {
+            var expleft = Expression.Constant("colName");
+            var expRight = Expression.Constant("colValue");
+             var lambda= Expression.Lambda<Func<bool>>(
+                Expression.MakeBinary(ExpressionType.Equal,
+                   expleft,
+                   expRight
+                ));
+           var ok=  lambda.Compile().Invoke();
+            MyExpressionVisitor visitor = new MyExpressionVisitor();
+            var value= visitor.VisitBinary(lambda.Body as BinaryExpression);
+           
+        }
+
         [TestMethod]
         public void GetLambdaExpression()
         {
@@ -92,5 +114,36 @@ namespace OdataTests.dotnetExpressions
         {
             return expression.Compile().Invoke("ok", "ok");
         }
+        public static void AccessProperty(Expression<Func<MyModel,bool>> expr)
+        {
+            var myl = expr;
+        }
+       
     }
+
+    public class MyModel
+    {
+        public string Id { get; set; }
+    }
+    public class MyExpressionVisitor
+    {
+      
+
+        public MyExpressionVisitor() : base() { }
+        public string VisitBinary(BinaryExpression node)
+        {
+            return $"{(node.Left as ConstantExpression).Value.ToString()}={(node.Right as ConstantExpression).Value.ToString()}";
+        }
+         public string VisitConstant(ConstantExpression node)
+        {
+
+            return node.Value.ToString();
+        }
+        public string VisitParameter(ParameterExpression node)
+        {
+         
+            return node.Name;
+        }
+    }
+  
 }

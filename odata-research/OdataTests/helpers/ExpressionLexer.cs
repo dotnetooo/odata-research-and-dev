@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using System.Collections.ObjectModel;
+using OdataTests.dotnetExpressions;
 
 namespace OdataTests.helpers
 {
@@ -38,6 +39,13 @@ namespace OdataTests.helpers
                 tokens.Add(token);
             }
             Assert.IsTrue(tokens.Count == 13);
+        }
+        [TestMethod]
+        public void getParamFilter()
+        {
+            string where = "colum1=value1 and column2=value2 or column3   !=value2";
+            RocketUriParser parser = new RocketUriParser();
+            var filter= parser.ParseFilter(where);
         }
         [TestMethod]
         public void testFilterProcced()
@@ -167,6 +175,62 @@ namespace OdataTests.helpers
             }
             return tokens;
         }
+
+        public FilterBuilder ParseFilter(string whereClause)
+        {
+            ExpressionLexer lexer = new ExpressionLexer(whereClause);
+            List<FunctionToken> tokens = new List<FunctionToken>();
+            ExpressionToken token = default(ExpressionToken);
+            FilterBuilder filterBuilder = new FilterBuilder();
+            while ((token = lexer.NextToken()).Kind != ExpressionTokenKind.End)
+            {
+           
+                switch(token.Kind)
+                {
+                    case ExpressionTokenKind.Identifier:
+                        if (!token.IsSqlLogical)
+                        {
+                            var nextToken = lexer.TryPeekNext();
+                            if (nextToken.IsSqlComparison)
+                            {
+                                // adding a left operand
+                                filterBuilder.AddFieldName(token.Text?.Trim());
+                            }
+                            else if (nextToken.IsSqlLogical)
+                            {
+                                // right operand 
+                                filterBuilder.InitAndSetParam(token.Text?.Trim(), token.Text?.Trim());
+                            }
+                            else if(nextToken.Kind==ExpressionTokenKind.End)
+                            {
+                                filterBuilder.InitAndSetParam(token.Text?.Trim(), token.Text?.Trim());
+                            }
+                        }
+                        else
+                        {
+                            filterBuilder.WriteToken(" {0} ", token.Text?.Trim());
+                        }
+                        break;
+                    case ExpressionTokenKind.EqualSign:
+                        filterBuilder.WriteToken(token.Text?.Trim(), "{0}");
+                        break;
+                    case ExpressionTokenKind.NotEqualSign:
+                        filterBuilder.WriteToken(token.Text?.Trim(), "{0}");
+                        break;
+                    case ExpressionTokenKind.GreaterOrEqualSign:
+                        filterBuilder.WriteToken(token.Text?.Trim(), "{0}");
+                        break;
+                    case ExpressionTokenKind.LessOrEqualSign:
+                        filterBuilder.WriteToken(token.Text?.Trim(), "{0}");
+                        break;
+                    default:
+                        break;
+                   
+                }
+            }
+
+            return filterBuilder;
+        }
     }
 
     public class ExpressionLexer
@@ -248,6 +312,7 @@ namespace OdataTests.helpers
                     break;
                 case '!':
                     tokenKind = ExpressionTokenKind.Exclamation;
+                    NextChar();
                     if ((TryPeekNext().Kind == ExpressionTokenKind.EqualSign))
                     {
                         ReadToken(c => !Char.IsLetterOrDigit(c));
@@ -284,7 +349,6 @@ namespace OdataTests.helpers
             Char? c = this.Ch;
             string text = this.TokenText;
             ExpressionToken saved = Token;
-            NextChar();
             ExpressionToken result = NextToken();
             this.TextPos = savedPosition;
             this.Ch = c;
@@ -373,6 +437,37 @@ namespace OdataTests.helpers
                     this.Text == ExpressionConstants.KeywordLessThanOrEqual ||
                     this.Text == ExpressionConstants.KeywordGreaterThanOrEqual ;
                     
+            }
+        }
+
+        internal bool IsSqlComparison
+        {
+            get
+            {
+                return
+                    this.Kind == ExpressionTokenKind.EqualSign ||
+                    this.Kind == ExpressionTokenKind.NotEqualSign ||
+                    this.Kind == ExpressionTokenKind.GreaterOrEqualSign ||
+                    this.Kind == ExpressionTokenKind.GreaterSign ||
+                    this.Kind == ExpressionTokenKind.LessSign ||
+                    this.Kind == ExpressionTokenKind.LessOrEqualSign;
+            }
+      
+        }
+
+        internal bool IsSqlLogical
+        {
+            get
+            {
+                if(this.Kind!=ExpressionTokenKind.Identifier)
+                {
+                    return false;
+                }
+                else
+                {
+                    return new string[] { "AND", "OR", "NOT" }
+                           .Contains(this.Text?.ToUpper());
+                }
             }
         }
 

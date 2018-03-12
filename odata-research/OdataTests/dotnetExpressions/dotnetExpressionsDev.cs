@@ -4,15 +4,22 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq.Expressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OdataParserProject;
+using System.Dynamic;
+
 namespace OdataTests.dotnetExpressions
 {
     [TestClass]
    public  class dotnetExpressionsDev
     {
         [TestMethod]
-        public void ExpConstants()
+        public void MakeDynamicObjec()
         {
-            
+            object obj = new { name = "ruslan" };
+            dynamic myobj = new ExpandoObject();
+            var expandoDict = myobj as IDictionary<string, object>;
+            expandoDict.Add("value1", "value1");
+
         }
         [TestMethod]
         public void makeOneSqlExpression()
@@ -63,6 +70,7 @@ namespace OdataTests.dotnetExpressions
 
         }
         #endregion
+       
         [TestMethod]
         public void parseSql()
         {

@@ -212,16 +212,16 @@ namespace OdataTests.helpers
                         }
                         break;
                     case ExpressionTokenKind.EqualSign:
-                        filterBuilder.WriteToken(token.Text?.Trim(), "{0}");
+                        filterBuilder.WriteToken("{0}",token.Text?.Trim());
                         break;
                     case ExpressionTokenKind.NotEqualSign:
-                        filterBuilder.WriteToken(token.Text?.Trim(), "{0}");
+                        filterBuilder.WriteToken("{0}", token.Text?.Trim());
                         break;
                     case ExpressionTokenKind.GreaterOrEqualSign:
-                        filterBuilder.WriteToken(token.Text?.Trim(), "{0}");
+                        filterBuilder.WriteToken("{0}", token.Text?.Trim());
                         break;
                     case ExpressionTokenKind.LessOrEqualSign:
-                        filterBuilder.WriteToken(token.Text?.Trim(), "{0}");
+                        filterBuilder.WriteToken("{0}", token.Text?.Trim());
                         break;
                     default:
                         break;

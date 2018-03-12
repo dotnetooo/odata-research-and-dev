@@ -29,8 +29,9 @@ namespace OdataTests.dotnetExpressions
         }
         internal void AddFieldName(string fieldName)
         {
-            _fieldNames.Add(fieldName);
-            WriteToken("${0}",fieldName);
+            var fl = $"${fieldName}";
+            _fieldNames.Add(fl);
+            WriteToken("{0}",fl);
         }
         internal void InitAndSetParam(string paramName,object paramValue)
         {

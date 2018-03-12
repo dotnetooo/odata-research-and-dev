@@ -23,7 +23,7 @@ namespace OdataParserProject
         {
             return Expression.Bind(typeof(TModel).GetProperty(propertyName), parameter);
         }
-        public Expression<Func<TModel,bool>> CreateBinaryExpression(string filter)
+        public Expression<Func<TModel,bool>> CreateLambdaExpression(string filter)
         {
             ExpressionLexer lexer = new ExpressionLexer(filter);
             ExpressionToken token = lexer.NextToken();
@@ -34,8 +34,13 @@ namespace OdataParserProject
 
             return null;
         }
-
-
+       private BinaryExpression createBinaryExpression(ExpressionToken left,ExpressionToken operatorToken,ExpressionToken right)
+        {
+            var expType = ExpressionHelper.TokenToLinqExpression(operatorToken);
+            return Expression.MakeBinary(expType,
+                Expression.Constant(left.Text),
+                Expression.Constant(right.Text));
+        }
     }
        
 
@@ -604,6 +609,38 @@ namespace OdataParserProject
 
         /// <summary>'NaN' literal, as used in XML for not-a-number values.</summary>
         internal const string NaNLiteral = "NaN";
+    }
+
+    public static class ExpressionHelper
+    {
+        public static ExpressionType TokenToLinqExpression(ExpressionToken expression)
+        {
+            switch(expression.Kind)
+            {
+                case ExpressionTokenKind.Add:
+                    return ExpressionType.Add;
+                case ExpressionTokenKind.And:
+                    return ExpressionType.And;
+                case ExpressionTokenKind.Or:
+                    return ExpressionType.Or;
+                case ExpressionTokenKind.Minus:
+                    return ExpressionType.Subtract;
+                case ExpressionTokenKind.Multiply:
+                    return ExpressionType.Multiply;
+                case ExpressionTokenKind.Equal:
+                    return ExpressionType.Equal;
+                case ExpressionTokenKind.GreaterOrEqualSign:
+                    return ExpressionType.GreaterThanOrEqual;
+                case ExpressionTokenKind.LessOrEqualSign:
+                    return ExpressionType.LessThanOrEqual;
+                case ExpressionTokenKind.NotEqualSign:
+                    return ExpressionType.NotEqual;
+                default:
+                    throw new Exception("not found");
+
+            }
+            
+        }
     }
 
     
